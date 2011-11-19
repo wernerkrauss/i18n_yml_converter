@@ -154,6 +154,9 @@ class i18nYMLConverter {
 				$parts = explode('_', $locale);
 				if(count($parts) == 2 && strtolower($parts[0]) == strtolower($parts[1])) {
 					$locale = strtolower($parts[0]);
+				} else {
+					// Use IETF notation (en-US instead of en_US)
+					$locale = implode('-', $parts);
 				}
 			}
 			
