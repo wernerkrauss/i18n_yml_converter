@@ -197,7 +197,7 @@ class i18nYMLConverter {
 					$locale = strtolower($parts[0]);
 				} else {
 					// Use IETF notation (en-US instead of en_US)
-					$locale = implode('-', $parts);
+					$locale = implode('_', $parts);
 				}
 			}
 			
