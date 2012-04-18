@@ -78,6 +78,8 @@ class i18nYMLConverter {
 	}
 
 	function run($restrictToModules = null) {
+		if(class_exists('Deprecation')) Deprecation::notification_version('2.4');
+
 		$modules = array();
 		
 		// A master string tables array (one mst per module)
@@ -119,7 +121,9 @@ class i18nYMLConverter {
 		global $lang;
 		
 		$return = array();
-		$files = new GlobIterator("$this->basePath/$module/$this->langFolder/*.php");
+		$folder = "$this->basePath/$module/$this->langFolder";
+		$files = new GlobIterator("$folder/*.php");
+		if(!count($files)) throw new LogicException(sprintf('Could not find any PHP lang files in %s', $folder));
 		foreach($files as $file) {
 			$fileLocale = preg_replace('/\.php/', '', $file->getFileName());
 			
@@ -127,7 +131,7 @@ class i18nYMLConverter {
 			$lang = array('en_US' => array());
 			$lang[$fileLocale] = array();
 			require($file->getPathName());
-			if($fileLocale != 'en_US') unset($lang['en_US']);
+			// if($fileLocale != 'en_US') unset($lang['en_US']);
 			
 			$return[$fileLocale] = $lang[$fileLocale];
 		}
@@ -138,14 +142,16 @@ class i18nYMLConverter {
 	function processModule($module) {		
 		$translations = $this->getTranslationsByModule($module);
 		$master = $translations['en_US'];
+		$otherMasterLocales = array();
 		
 		// Special case: Move translations according to location of master entity,
 		// mainly to fix up the file migration between modules during the 3.0 release.
 		// Adds a bit of duplicated parsing effort, but its a one off process anyway.
-		if(in_array($module, array('sapphire', 'cms')) ) {
-			$otherModule = ($module == 'cms') ? 'sapphire' : 'cms';
+		// Note: Using SAPPHIRE_DIR for backwards compat
+		if(in_array($module, array(SAPPHIRE_DIR, CMS_DIR)) ) {
+			$otherModule = ($module == CMS_DIR) ? SAPPHIRE_DIR : CMS_DIR;
 			$otherTranslations = $this->getTranslationsByModule($otherModule);
-			$otherMaster = $otherMasterLocales['en_US'];
+			$otherMaster = $otherTranslations['en_US'];
 			foreach($otherTranslations as $locale => $namespaces) {
 				if($locale == 'en_US') continue;
 				foreach($namespaces as $namespace => $entities) {
@@ -214,7 +220,7 @@ class i18nYMLConverter {
 					
 					if(is_array($entity)) {
 						$trans = $entity[0];
-						$context = $entity[2];
+						$context = $entity[1];
 					} else {
 						$trans = $entity;
 						$context = null;
