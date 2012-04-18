@@ -53,6 +53,7 @@ class i18nYMLConverter {
 		"nl_NL" => "nl",
 		"pa_IN" => "pa",
 		"pl_PL" => "pl",
+		"pl_PL" => "pl",
 		"ro_RO" => "ro",
 		"ru_RU" => "ru",
 		"si_LK" => "si",
@@ -230,7 +231,7 @@ class i18nYMLConverter {
 					if(preg_match('/[\n\r]/', $trans)) {
 						$yml .= str_repeat($this->indent, 2) . "$id: |\n";
 						$blockIndent = str_repeat($this->indent, 2) . str_pad('', strlen($id)+3, ' ');
-						$yml .= $blockIndent . implode("\n" . $blockIndent, explode("\n", $trans));
+						$yml .= $blockIndent . implode("\n" . $blockIndent, explode("\n", $trans)) . "\n";
 					} else {
 						$trans = str_replace(array('"'), array('\"'), $trans); // quote strings
 						$yml .= str_repeat($this->indent, 2) . "$id: \"$trans\"\n";
