@@ -1,4 +1,9 @@
 <?php
+use SilverStripe\Control\Director;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\Security;
+
 /**
  * @package sapphire
  * @subpackage tasks
@@ -9,7 +14,7 @@ class i18nYMLConverterTask extends BuildTask {
 	
 	protected $description = "";
 	
-	function init() {
+	public function init() {
 		parent::init();
 		
 		$canAccess = (Director::isDev() || Director::is_cli() || Permission::check("ADMIN"));

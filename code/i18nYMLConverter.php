@@ -1,4 +1,7 @@
 <?php
+use SilverStripe\Control\Director;
+use SilverStripe\Dev\Deprecation;
+
 class i18nYMLConverter {
 	
 	/**
@@ -73,13 +76,17 @@ class i18nYMLConverter {
 	/**
 	 * @param $locale
 	 */
-	function __construct() {
+	public function __construct() {
 		$this->basePath = Director::baseFolder();
 		$this->baseSavePath = Director::baseFolder();
 	}
 
-	function run($restrictToModules = null) {
+	public function run($restrictToModules = null) {
 		if(class_exists('Deprecation')) Deprecation::notification_version('2.4');
+
+		if (!defined('SAPPHIRE_DIR')) {
+		    define('SAPPHIRE_DIR', FRAMEWORK_DIR);
+        }
 
 		$modules = array();
 		
@@ -118,7 +125,7 @@ class i18nYMLConverter {
 	 * @param String
 	 * @return array
 	 */
-	function getTranslationsByModule($module) {
+	public function getTranslationsByModule($module) {
 		global $lang;
 		
 		$return = array();
@@ -140,7 +147,7 @@ class i18nYMLConverter {
 		return $return;
 	}
 	
-	function processModule($module) {		
+	public function processModule($module) {
 		$translations = $this->getTranslationsByModule($module);
 		$master = $translations['en_US'];
 		$otherMasterLocales = array();
@@ -149,6 +156,8 @@ class i18nYMLConverter {
 		// mainly to fix up the file migration between modules during the 3.0 release.
 		// Adds a bit of duplicated parsing effort, but its a one off process anyway.
 		// Note: Using SAPPHIRE_DIR for backwards compat
+
+
 		if(in_array($module, array(SAPPHIRE_DIR, CMS_DIR)) ) {
 			$otherModule = ($module == CMS_DIR) ? SAPPHIRE_DIR : CMS_DIR;
 			$otherTranslations = $this->getTranslationsByModule($otherModule);
